@@ -1,0 +1,115 @@
+#Задание1
+#Используя ЦПТ: наложение двух рандомных выборок даст распределение Гаусса, 
+#к которой уже можно будет применять статистический анализ по известному распределению.
+#Работает на большом кол-ве значенийCчитать нужно по кол-во колонок на гистограмме, судя по всему 13.
+
+#Задание 2
+#Непонятно как посчитать точное значение, не зная сгенерированных рандомных значений.
+#Можно только предположить по рисунку, что на местах 1 и 3 кв#Задание1
+#Используя ЦПТ: наложение двух рандомных выборок даст распределение Гаусса, 
+#к которой уже можно будет применять статистический анализ по известному распределению.
+#Работает на большом кол-ве значенийCчитать нужно по кол-во колонок на гистограмме, судя по всему 13.адранта стоит отрицательное значение,
+#порядка -0.5 или -0.6. [[1,-0.6],[-0.6,1]]
+
+#Задание3
+import numpy.linalg as la
+import numpy as np
+import matplotlib.pyplot as plt
+%matplotlib inline
+
+#Задаю рандомную выборку
+X=np.random.normal(0,1,size=(500,2))
+#Определяю матрицу ковариаций
+C=[[1,-0.6],[-0.6,1]]
+#Применяю разложение Холецкого для поиска собственного вектора
+A=la.cholesky(C)
+#Масштабирую матрицу
+Y=np.matrix(x)*A
+
+plt.plot(X[:,0],X[:,1], 'r.')
+plt.show()
+plt.plot(Y[:,0],Y[:,1], 'g.')
+
+#Задание 4
+
+#Визуально угол между 2п/3 и 3п/4
+import math
+theta = 130
+#Задаю матрицу синусов,косинусов
+u=np.matrix('{};{}'.format(math.sin(theta),math.cos(theta)))
+yp=Y*u
+var_emperical=np.var(yp)
+var_theoretical=u.T*C*u
+print(var_emperical,var_theoretical)
+
+#Задание 5
+#Кажется, что визуально угол был определен совсем неверно, скорее он ближе к 120
+#Для угла = 120 значения получаются такие 0.4412188361149811 [[0.43273291]].
+#Если оставить угол 130 и увеличить кол-во данных, то значения не изменятся.
+
+#Задание 6
+#Задаю массив углов
+degree=[2*math.pi/360*i for i in range(360)]
+variances=[]
+variances_em=[]
+for i in degree:
+    u=np.matrix('{};{}'.format(math.sin(i),math.cos(i)))
+    yp=Y*u
+    var_empirical=np.var(yp)
+    var_theoretical=u.T*C*u
+    #Для каждого угла записываю в последовательность теоретическую варианцию
+    variances.append(var_theoretical)
+    #Длякаждого угла записываю в последовательность эмпирическую вариацию
+    variances_em.append(var_empirical)
+plt.scatter(degree,variances)
+plt.scatter(degree,variances_em)
+
+#Задание 7
+#Не нашла файл, который нужно загрузить, поэтому загружаю авокадо
+
+import io
+import requests
+import pandas as pd
+
+url="http://yustiks.ru/avocado.csv"
+data=pd.read_csv(url)
+
+#Задание 8
+from sklearn import preprocessing
+min_max_scaler = preprocessing.MinMaxScaler(feature_range=(-1,1))
+np_scaled=min_max_scaler.fit_transform(data[['Total Volume', 'AveragePrice']])
+data_norm = pd.DataFrame(np_scaled)
+plt.plot(data_norm[0],data_norm[1],'.')
+data.head(1)
+
+#Задание 9
+#матрица переменной
+def cov(x,y):
+    return np.sum((x-x.mean()*y-y.mean())/len(x)-1)
+#матрица ковариаций
+def cov_mat(X):
+    return np.array([[cov(X[0],X[0]),cov(X[0],X[1])],[cov(X[1],X[0]),cov(X[1],X[1])]])
+
+X=np.vstack((data_norm[0],data_norm[1]))
+cov_mat(X.T)
+
+
+#Задание 10
+import numpy.linalg as la
+#Получение собственных векторов и собственных чисел
+w,v=la.eig(cov_mat(X.T))
+plt.plot(X[0,:],X[1,:], '.')
+plt.quiver(0,0,v[:,0][0],v[:,0][1])
+plt.quiver(0,0,v[:,1][0],v[:,1][1])
+
+#Задание 11
+#Судя по графику проецирование на прямую [[1,1],[0,0]], т.е на прямую x=y
+
+#Задание 12 Моделирование подбрасываний игрального кубика
+
+number=100
+data=[]
+for i in range(number):
+    data.append([i+1,np.random.randint(1,6)])
+dat=pd.DataFrame(data,columns=['a','b'])
+plt.hist(dat['a'],dat['b'])
